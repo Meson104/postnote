@@ -1,0 +1,28 @@
+# Ignore platform-specific and auto-generated folders for Flutter
+/frontend/ios/** linguist-vendored
+/frontend/android/** linguist-vendored
+/frontend/macos/** linguist-vendored
+/frontend/linux/** linguist-vendored
+/frontend/windows/** linguist-vendored
+/frontend/web/** linguist-vendored
+
+# Ignore Flutter build artifacts
+/frontend/build/** linguist-generated
+/frontend/.dart_tool/** linguist-generated
+
+# Ignore CMake build and config
+**/CMakeLists.txt linguist-vendored
+**/cmake-build-*/** linguist-generated
+**/CMakeFiles/** linguist-generated
+**/Makefile linguist-generated
+
+# Ignore node_modules if using Node.js backend
+/backend/node_modules/** linguist-generated
+
+# Ignore Python venv if using Python backend
+/backend/venv/** linguist-generated
+/backend/env/** linguist-generated
+
+# Ignore VSCode or IDE settings
+**/.vscode/** linguist-generated
+**/.idea/** linguist-generated
