@@ -1,0 +1,51 @@
+# Flutter / Dart stuff
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.melos_tool/
+generated_plugin_registrant.dart
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# macOS / Linux / Windows OS junk
+.DS_Store
+*.swp
+*.swo
+Thumbs.db
+
+# CMake, native build files, obj and cache
+**/cmake-build-debug/
+**/cmake-build-release/
+**/CMakeFiles/
+**/Makefile
+**/CMakeCache.txt
+**/build/
+
+# Android/iOS platform build junk
+android/.gradle/
+android/build/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Flutter/engine/
+ios/Pods/
+ios/.symlinks/
+ios/Runner.xcworkspace/
+
+# VS Code settings for Dart
+.dart_server/
+
+# Logs
+*.log
+
+# Firebase
+.firebase/
+
+# Coverage reports
+coverage/
