@@ -49,3 +49,6 @@ ios/Runner.xcworkspace/
 
 # Coverage reports
 coverage/
+
+#backend environment
+/backend/.env
