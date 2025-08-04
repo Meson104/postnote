@@ -3,7 +3,11 @@ import { db } from '../db';
 import { NewUser, users } from '../db/schema';
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+import { auth, AuthRequest } from '../middlewares/auth.middleware';
 
+dotenv.config();
 
 
 const authRouter = Router(); 
@@ -68,19 +72,66 @@ authRouter.post("/login", async(req:Request<{},{},LoginBody>, res:Response) =>{
             return;
         }
 
-        res.status(200).json({
-            message : "Welcome " + existingUser.name ,
-        });
+        const token = jwt.sign({id:existingUser.id}, process.env.JWT_SECRET!)
+
+        res.status(200).json({token, ...existingUser});
+            
+        
 
     }
     catch(e){
         res.status(500).json({error:e});
     }
+});
+
+authRouter.post("/tokenIsValid", async(req , res)=> {
+    try{
+
+        const token = req.header("x-auth-token");
+        if(!token){
+            res.json(false);
+            return;
+        }
+        const verified = jwt.verify(token, process.env.JWT_SECRET!);
+        if(!verified){
+            res.json(false);
+            return;
+        }
+        const verifiedToken = verified as {id: string};
+        const user = await db.select().from(users).where(eq(users.id, verifiedToken.id));
+
+        if(!user){
+            res.json(false);
+            return;
+        }
+
+        res.status(200).json(true);
+
+    }
+    catch(e){
+        res.status(500).json(false);
+    }
 })
 
 
-authRouter.get("/", (req, res) => {
-    res.send('Hi, this is the auth route!');
+authRouter.get("/",auth, (req : AuthRequest, res) => {
+    try{
+
+        if(!req.user){
+            res.status(404).json({msg: "User not found"});
+            return;
+        }
+
+        const user = db.select().from(users).where(eq(users.id,req.user));
+
+        res.status(200).json({...user, token : req.token}); 
+
+       
+
+    }
+    catch(e){
+        res.status(500).json(false);
+    }
 }); 
 
 export default authRouter;  
