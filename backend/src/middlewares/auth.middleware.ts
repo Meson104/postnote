@@ -17,19 +17,19 @@ export const auth = async (req : AuthRequest, res : Response, next : NextFunctio
     
             const token = req.header("x-auth-token");
             if(!token){
-                res.status(401).json({msg: "No authentication token, authorization denied"});
+                res.status(401).json({error: "No authentication token, authorization denied"});
                 return;
             }
             const verified = jwt.verify(token, process.env.JWT_SECRET!);
             if(!verified){
-                res.status(401).json({msg : "Token verification failed, authorization denied "});
+                res.status(401).json({error : "Token verification failed, authorization denied "});
                 return;
             }
             const verifiedToken = verified as {id: UUID};
             const [user] = await db.select().from(users).where(eq(users.id, verifiedToken.id));
     
             if(!user){
-                res.status(404).json({msg : "User not found"});
+                res.status(404).json({error : "User not found"});
                 return;
             }
 

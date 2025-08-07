@@ -68,7 +68,7 @@ authRouter.post("/login", async(req:Request<{},{},LoginBody>, res:Response) =>{
          //check password
         const isMatch = await bcrypt.compare(password, existingUser.password);
         if(!isMatch){
-            res.status(400).json({msg:"Incorrect credentials - password"});
+            res.status(400).json({error:"Incorrect credentials - password"});
             return;
         }
 
@@ -118,7 +118,7 @@ authRouter.get("/",auth, (req : AuthRequest, res) => {
     try{
 
         if(!req.user){
-            res.status(404).json({msg: "User not found"});
+            res.status(404).json({error: "User not found"});
             return;
         }
 
