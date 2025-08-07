@@ -29,7 +29,7 @@ class _SignupPageState extends State<SignupPage> {
 
   void signupUser() {
     if (formKey.currentState!.validate()) {
-      print('signupbutton pressed');
+      // print('signupbutton pressed');
       // Do signup logic here
       context.read<AuthCubit>().signUp(
         name: nameController.text.trim(),
@@ -46,7 +46,6 @@ class _SignupPageState extends State<SignupPage> {
       backgroundColor: Colors.white,
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
-          // TODO: implement listener
           if (state is AuthError) {
             ScaffoldMessenger.of(
               context,
