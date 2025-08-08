@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/auth/cubit/auth_cubit.dart';
 import 'package:frontend/features/auth/pages/signup_page.dart';
+import 'package:frontend/features/home/pages/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -51,10 +52,11 @@ class _LoginPageState extends State<LoginPage> {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(const SnackBar(content: Text('Welcome aboard!')));
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(builder: (_) => const HomePage()) ),
-            // );
+            Navigator.pushAndRemoveUntil(
+              context,
+              HomePage.route(),
+              (_) => false,
+            );
           }
         },
         builder: (context, state) {

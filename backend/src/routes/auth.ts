@@ -130,7 +130,7 @@ authRouter.get("/",auth, (req : AuthRequest, res) => {
 
     }
     catch(e){
-        res.status(500).json(false);
+        res.status(500).json({error : e});
     }
 }); 
 
