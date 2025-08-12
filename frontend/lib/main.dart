@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/auth/cubit/auth_cubit.dart';
 import 'package:frontend/features/auth/pages/signup_page.dart';
+import 'package:frontend/features/auth/repositories/auth_local_repository.dart';
 import 'package:frontend/features/home/pages/home_page.dart';
 
 void main() {
+  // WidgetsFlutterBinding.ensureInitialized();
+
+  // // TEMP: Reset the table once
+  // AuthLocalRepository().resetUsersTable();
   runApp(
     MultiBlocProvider(
       providers: [BlocProvider(create: (_) => AuthCubit())],
@@ -62,6 +67,7 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
         ),
+        fontFamily: 'Poppins',
       ),
       home: BlocBuilder<AuthCubit, AuthState>(
         builder: (context, state) {

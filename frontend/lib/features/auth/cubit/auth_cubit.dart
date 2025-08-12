@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/core/services/shared_prefs_services.dart';
+import 'package:frontend/features/auth/repositories/auth_local_repository.dart';
 import 'package:frontend/features/auth/repositories/auth_remote_repository.dart';
 import 'package:frontend/models/user_model.dart';
 
@@ -8,6 +9,7 @@ part 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
   final authRemoteRepository = AuthRemoteRepository();
+  final authLocalRepository = AuthLocalRepository();
   final sharedPrefsServices = SharedPrefsServices();
 
   void getUserData() async {
@@ -16,6 +18,7 @@ class AuthCubit extends Cubit<AuthState> {
       await authRemoteRepository.getUserData();
       final userModel = await authRemoteRepository.getUserData();
       if (userModel != null) {
+        await authLocalRepository.insertUser(userModel);
         emit(AuthLoggedIn(userModel));
         return;
       }
@@ -55,6 +58,9 @@ class AuthCubit extends Cubit<AuthState> {
       if (userModel.token.isNotEmpty) {
         await sharedPrefsServices.setToken(userModel.token);
       }
+
+      await authLocalRepository.insertUser(userModel);
+
       emit(AuthLoggedIn(userModel));
     } catch (e) {
       emit(AuthError(e.toString()));
