@@ -13,3 +13,16 @@ export const users = pgTable("users", {
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+
+export const notes = pgTable("notes",{
+    id : uuid("id").primaryKey().defaultRandom(),
+    title : text("title").notNull(),
+    content : text("content").notNull(),
+    hexColor : text("hex_color").notNull(),
+    uid : uuid("uid").notNull().references(() => users.id,{onDelete: 'cascade'}),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export type Notes = typeof notes.$inferSelect;
+export type NewNotes = typeof notes.$inferInsert;

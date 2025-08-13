@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/auth/cubit/auth_cubit.dart';
 import 'package:frontend/features/auth/pages/signup_page.dart';
 import 'package:frontend/features/auth/repositories/auth_local_repository.dart';
+import 'package:frontend/features/home/cubit/notes_cubit.dart';
 import 'package:frontend/features/home/pages/home_page.dart';
 
 void main() {
@@ -12,7 +13,11 @@ void main() {
   // AuthLocalRepository().resetUsersTable();
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => AuthCubit())],
+      providers: [
+        BlocProvider(create: (_) => AuthCubit()),
+        BlocProvider(create: (_) => NotesCubit()),
+      ],
+
       child: const MyApp(),
     ),
   );
