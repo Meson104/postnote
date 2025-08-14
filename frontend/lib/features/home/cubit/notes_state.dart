@@ -13,9 +13,9 @@ final class NotesError extends NotesState {
   NotesError(this.error);
 }
 
-final class NotesSuccess extends NotesState {
-  final NotesModel noteModel;
-  const NotesSuccess(this.noteModel);
+final class AddNewNoteSuccess extends NotesState {
+  final NotesModel notesModel;
+  const AddNewNoteSuccess(this.notesModel);
 }
 
 final class GetNotesSuccess extends NotesState {

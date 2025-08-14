@@ -20,6 +20,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  DateTime selectedDate = DateTime.now();
+
   @override
   void initState() {
     super.initState();
@@ -50,11 +52,26 @@ class _HomePageState extends State<HomePage> {
             return Center(child: Text(state.error));
           }
           if (state is GetNotesSuccess) {
-            final notes = state.notes;
+            final notes = state.notes
+                .where(
+                  (elem) =>
+                      DateFormat('d').format(elem.dueAt) ==
+                          DateFormat('d').format(selectedDate) &&
+                      selectedDate.month == elem.dueAt.month &&
+                      selectedDate.year == elem.dueAt.year,
+                )
+                .toList();
             return Column(
               children: [
                 //date selector
-                const DateSelector(),
+                DateSelector(
+                  selectedDate: selectedDate,
+                  onTap: (date) {
+                    setState(() {
+                      selectedDate = date;
+                    });
+                  },
+                ),
                 Expanded(
                   child: ListView.builder(
                     itemCount: notes.length,
@@ -80,7 +97,7 @@ class _HomePageState extends State<HomePage> {
                           Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Text(
-                              DateFormat.jm().format(note.createdAt),
+                              DateFormat.jm().format(note.dueAt),
                               style: TextStyle(fontSize: 15),
                             ),
                           ),

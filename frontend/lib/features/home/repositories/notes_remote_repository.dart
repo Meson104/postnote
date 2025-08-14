@@ -8,8 +8,10 @@ class NotesRemoteRepository {
   Future<NotesModel> createNote({
     required String title,
     required String content,
+    required String uid,
     required String token,
     required String hexColor,
+    required DateTime dueAt,
   }) async {
     // Implementation for creating a note
     try {
@@ -20,6 +22,7 @@ class NotesRemoteRepository {
           'title': title,
           'content': content,
           'hexColor': hexColor,
+          'dueAt': dueAt.toIso8601String(),
         }),
       );
 
@@ -53,6 +56,32 @@ class NotesRemoteRepository {
       return notesList;
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<bool> syncNotes({
+    required String token,
+    required List<NotesModel> notes,
+  }) async {
+    try {
+      final notesListInMap = [];
+      for (final notes in notes) {
+        notesListInMap.add(notes.toMap());
+      }
+      final res = await http.post(
+        Uri.parse("${Constants.backendUri}/notes/sync"),
+        headers: {'Content-Type': 'application/json', 'x-auth-token': token},
+        body: jsonEncode(notesListInMap),
+      );
+
+      if (res.statusCode != 201) {
+        throw jsonDecode(res.body)['error'];
+      }
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
     }
   }
 }

@@ -10,20 +10,20 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
   final authRemoteRepository = AuthRemoteRepository();
   final authLocalRepository = AuthLocalRepository();
-  final sharedPrefsServices = SharedPrefsServices();
+  final spService = SpService();
 
   void getUserData() async {
     try {
       emit(AuthLoading());
-      await authRemoteRepository.getUserData();
       final userModel = await authRemoteRepository.getUserData();
       if (userModel != null) {
         await authLocalRepository.insertUser(userModel);
         emit(AuthLoggedIn(userModel));
-        return;
+      } else {
+        emit(AuthInitial());
       }
-      emit(AuthInitial());
     } catch (e) {
+      print(e);
       emit(AuthInitial());
     }
   }
@@ -56,7 +56,7 @@ class AuthCubit extends Cubit<AuthState> {
       );
 
       if (userModel.token.isNotEmpty) {
-        await sharedPrefsServices.setToken(userModel.token);
+        await spService.setToken(userModel.token);
       }
 
       await authLocalRepository.insertUser(userModel);

@@ -116,18 +116,12 @@ authRouter.post("/tokenIsValid", async(req , res)=> {
 
 authRouter.get("/",auth, (req : AuthRequest, res) => {
     try{
-
         if(!req.user){
             res.status(404).json({error: "User not found"});
             return;
         }
-
         const user = db.select().from(users).where(eq(users.id,req.user));
-
         res.status(200).json({...user, token : req.token}); 
-
-       
-
     }
     catch(e){
         res.status(500).json({error : e});

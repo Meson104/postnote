@@ -7,7 +7,7 @@ import 'package:frontend/models/user_model.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRemoteRepository {
-  final sharedPrefsService = SharedPrefsServices();
+  final spService = SpService();
   final authLocalRepository = AuthLocalRepository();
 
   Future<UserModel> signUp({
@@ -16,16 +16,17 @@ class AuthRemoteRepository {
     required String password,
   }) async {
     try {
-      final response = await http.post(
+      final res = await http.post(
         Uri.parse('${Constants.backendUri}/auth/signup'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'name': name, 'email': email, 'password': password}),
       );
 
-      if (response.statusCode != 201) {
-        throw jsonDecode(response.body)['error'];
+      if (res.statusCode != 201) {
+        throw jsonDecode(res.body)['error'];
       }
-      return UserModel.fromJson(response.body);
+
+      return UserModel.fromJson(res.body);
     } catch (e) {
       throw e.toString();
     }
@@ -36,16 +37,17 @@ class AuthRemoteRepository {
     required String password,
   }) async {
     try {
-      final response = await http.post(
+      final res = await http.post(
         Uri.parse('${Constants.backendUri}/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
       );
 
-      if (response.statusCode != 200) {
-        throw jsonDecode(response.body)['error'];
+      if (res.statusCode != 200) {
+        throw jsonDecode(res.body)['error'];
       }
-      return UserModel.fromJson(response.body);
+
+      return UserModel.fromJson(res.body);
     } catch (e) {
       throw e.toString();
     }
@@ -53,29 +55,32 @@ class AuthRemoteRepository {
 
   Future<UserModel?> getUserData() async {
     try {
-      final token = await sharedPrefsService.getToken();
-      if (token == null) return null;
-      final response = await http.get(
+      final token = await spService.getToken();
+      if (token == null) {
+        return null;
+      }
+
+      final res = await http.post(
         Uri.parse('${Constants.backendUri}/auth/tokenIsValid'),
         headers: {'Content-Type': 'application/json', 'x-auth-token': token},
       );
 
-      if (response.statusCode != 200 || jsonDecode(response.body) == false) {
+      if (res.statusCode != 200 || jsonDecode(res.body) == false) {
         return null;
       }
 
-      final userRes = await http.get(
+      final userResponse = await http.get(
         Uri.parse('${Constants.backendUri}/auth'),
         headers: {'Content-Type': 'application/json', 'x-auth-token': token},
       );
 
-      if (userRes.statusCode != 200) {
-        throw jsonDecode(userRes.body)['error'];
+      if (userResponse.statusCode != 200) {
+        throw jsonDecode(userResponse.body)['error'];
       }
-
-      return UserModel.fromJson(userRes.body);
+      return UserModel.fromJson(userResponse.body);
     } catch (e) {
       final user = await authLocalRepository.getUser();
+      print(user);
       return user;
     }
   }

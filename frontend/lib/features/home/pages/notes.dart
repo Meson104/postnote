@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/auth/cubit/auth_cubit.dart';
 import 'package:frontend/features/home/cubit/notes_cubit.dart';
+import 'package:frontend/features/home/pages/home_page.dart';
 import 'package:intl/intl.dart';
 
 class NotesPage extends StatefulWidget {
@@ -19,16 +20,19 @@ class _NotesPageState extends State<NotesPage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
   Color selectedColor = Color.fromRGBO(246, 222, 194, 1);
+  DateTime selectedDate = DateTime.now();
   final _formKey = GlobalKey<FormState>();
 
   void createNote() async {
     if (_formKey.currentState!.validate()) {
       AuthLoggedIn user = await context.read<AuthCubit>().state as AuthLoggedIn;
       await context.read<NotesCubit>().createNewNote(
+        uid: user.user.id,
         title: titleController.text.trim(),
         content: contentController.text.trim(),
         token: user.user.token,
         color: selectedColor,
+        dueAt: selectedDate,
       );
     }
   }
@@ -47,9 +51,24 @@ class _NotesPageState extends State<NotesPage> {
       appBar: AppBar(
         title: const Text('Post a Note'),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Text((DateFormat('dd/MM/yyyy').format(date))),
+          GestureDetector(
+            onTap: () async {
+              final _selectedDate = await showDatePicker(
+                context: context,
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 90)),
+              );
+
+              if (_selectedDate != null) {
+                setState(() {
+                  selectedDate = _selectedDate;
+                });
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(DateFormat("MM-d-y").format(selectedDate)),
+            ),
           ),
         ],
       ),
@@ -59,11 +78,15 @@ class _NotesPageState extends State<NotesPage> {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(SnackBar(content: Text(state.error)));
-          } else if (state is NotesSuccess) {
+          } else if (state is AddNewNoteSuccess) {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(const SnackBar(content: Text('Note posted')));
-            Navigator.pop(context);
+            Navigator.pushAndRemoveUntil(
+              context,
+              HomePage.route(),
+              (route) => false,
+            );
           }
         },
         builder: (context, state) {

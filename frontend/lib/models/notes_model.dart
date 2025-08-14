@@ -10,16 +10,20 @@ class NotesModel {
   final String title;
   final String content;
   final Color color;
+  final DateTime dueAt;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final int isSynced;
   NotesModel({
     required this.id,
     required this.uid,
     required this.title,
     required this.content,
     required this.color,
+    required this.dueAt,
     required this.createdAt,
     required this.updatedAt,
+    required this.isSynced,
   });
 
   NotesModel copyWith({
@@ -28,8 +32,10 @@ class NotesModel {
     String? title,
     String? content,
     Color? color,
+    DateTime? dueAt,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? isSynced,
   }) {
     return NotesModel(
       id: id ?? this.id,
@@ -37,8 +43,10 @@ class NotesModel {
       title: title ?? this.title,
       content: content ?? this.content,
       color: color ?? this.color,
+      dueAt: dueAt ?? this.dueAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isSynced: isSynced ?? this.isSynced,
     );
   }
 
@@ -49,8 +57,10 @@ class NotesModel {
       'title': title,
       'content': content,
       'hexColor': rgbToHex(color),
+      'dueAt': dueAt.toIso8601String(),
       'createdAt': createdAt.millisecondsSinceEpoch,
       'updatedAt': updatedAt.millisecondsSinceEpoch,
+      'isSynced': isSynced,
     };
   }
 
@@ -61,8 +71,10 @@ class NotesModel {
       title: map['title'] ?? "",
       content: map['content'] ?? "",
       color: hexToRgb(map['hexColor']),
+      dueAt: DateTime.parse(map['dueAt']),
       createdAt: DateTime.parse(map['createdAt']),
       updatedAt: DateTime.parse(map['updatedAt']),
+      isSynced: map['isSynced'] ?? 1,
     );
   }
 
@@ -73,7 +85,7 @@ class NotesModel {
 
   @override
   String toString() {
-    return 'NotesModel(id: $id, uid: $uid, title: $title, content: $content, color : $color, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'NotesModel(id: $id, uid: $uid, title: $title, content: $content,dueAt: $dueAt, color : $color, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -85,8 +97,10 @@ class NotesModel {
         other.title == title &&
         other.content == content &&
         other.color == color &&
+        other.dueAt == dueAt &&
         other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.updatedAt == updatedAt &&
+        other.isSynced == isSynced;
   }
 
   @override
@@ -96,7 +110,9 @@ class NotesModel {
         title.hashCode ^
         content.hashCode ^
         color.hashCode ^
+        dueAt.hashCode ^
         createdAt.hashCode ^
-        updatedAt.hashCode;
+        updatedAt.hashCode ^
+        isSynced.hashCode;
   }
 }
