@@ -15,33 +15,41 @@ class NotesLocalRepostiory {
     return _database!;
   }
 
+  /// Helper to check if a column exists in a table
+  Future<bool> _columnExists(Database db, String table, String column) async {
+    final result = await db.rawQuery('PRAGMA table_info($table)');
+    return result.any((row) => row['name'] == column);
+  }
+
   Future<Database> _initDb() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, "notes.db");
     return openDatabase(
       path,
-      version: 4,
+      version: 5,
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < newVersion) {
-          await db.execute(
-            'ALTER TABLE $tableName ADD COLUMN isSynced INTEGER NOT NULL',
-          );
+        if (oldVersion < 5) {
+          if (!await _columnExists(db, tableName, 'isSynced')) {
+            await db.execute(
+              'ALTER TABLE $tableName ADD COLUMN isSynced INTEGER NOT NULL DEFAULT 0',
+            );
+          }
         }
       },
       onCreate: (db, version) {
         return db.execute('''
-            CREATE TABLE $tableName(
-              id TEXT PRIMARY KEY,
-              title TEXT NOT NULL,
-              content TEXT NOT NULL,
-              uid TEXT NOT NULL,
-              dueAt TEXT NOT NULL,
-              hexColor TEXT NOT NULL,
-              createdAt TEXT NOT NULL,
-              updatedAt TEXT NOT NULL,
-              isSynced INTEGER NOT NULL
-            )
-      ''');
+          CREATE TABLE $tableName(
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            uid TEXT NOT NULL,
+            dueAt TEXT NOT NULL,
+            hexColor TEXT NOT NULL,
+            createdAt TEXT NOT NULL,
+            updatedAt TEXT NOT NULL,
+            isSynced INTEGER NOT NULL
+          )
+        ''');
       },
     );
   }
@@ -62,22 +70,13 @@ class NotesLocalRepostiory {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
-
     await batch.commit(noResult: true);
   }
 
   Future<List<NotesModel>> getNotes() async {
     final db = await database;
     final result = await db.query(tableName);
-    if (result.isNotEmpty) {
-      List<NotesModel> notes = [];
-      for (final elem in result) {
-        notes.add(NotesModel.fromMap(elem));
-      }
-      return notes;
-    }
-
-    return [];
+    return result.map((elem) => NotesModel.fromMap(elem)).toList();
   }
 
   Future<List<NotesModel>> getUnsyncedNotes() async {
@@ -87,15 +86,7 @@ class NotesLocalRepostiory {
       where: 'isSynced = ?',
       whereArgs: [0],
     );
-    if (result.isNotEmpty) {
-      List<NotesModel> notes = [];
-      for (final elem in result) {
-        notes.add(NotesModel.fromMap(elem));
-      }
-      return notes;
-    }
-
-    return [];
+    return result.map((elem) => NotesModel.fromMap(elem)).toList();
   }
 
   Future<void> updateRowValue(String id, int newValue) async {

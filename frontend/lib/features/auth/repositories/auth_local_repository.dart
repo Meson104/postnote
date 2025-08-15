@@ -20,7 +20,7 @@ class AuthLocalRepository {
     final path = join(dbPath, "auth.db");
     return openDatabase(
       path,
-      version: 2,
+      version: 4,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < newVersion) {
           await db.execute('DROP TABLE $tableName');

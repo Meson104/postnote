@@ -58,8 +58,8 @@ class NotesModel {
       'content': content,
       'hexColor': rgbToHex(color),
       'dueAt': dueAt.toIso8601String(),
-      'createdAt': createdAt.millisecondsSinceEpoch,
-      'updatedAt': updatedAt.millisecondsSinceEpoch,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
       'isSynced': isSynced,
     };
   }
